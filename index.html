@@ -117,8 +117,6 @@
       transform: scale(1);
     }
 
-    summary::-webkit-details-marker { display: none; }
-
     .shake { animation: shake 0.4s ease; }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
@@ -181,81 +179,6 @@
         <span class="ar block mt-0.5">يستغرق حوالي دقيقة واحدة. جميع الإجابات مجهولة الهوية.</span>
       </p>
     </header>
-
-    <!-- About the project & student -->
-    <section id="aboutProject" class="w-full max-w-2xl mb-6">
-      <details class="glass rounded-3xl group" open>
-        <summary class="list-none cursor-pointer select-none p-5 sm:p-6 flex items-center gap-3">
-          <span class="w-10 h-10 shrink-0 rounded-xl bg-emerald-400/20 text-emerald-300 flex items-center justify-center"><i class="fa-solid fa-circle-info"></i></span>
-          <span class="flex-1">
-            <span class="font-bold text-lg block">About the Project &amp; Student</span>
-            <span class="ar block text-sm text-white/70">نبذة عن المشروع والطالب</span>
-          </span>
-          <i class="fa-solid fa-chevron-down text-white/60 transition-transform group-open:rotate-180"></i>
-        </summary>
-
-        <div class="px-5 sm:px-6 pb-6 space-y-5 text-sm leading-relaxed">
-          <!-- Student card -->
-          <div class="glass rounded-2xl p-4 flex items-center gap-4">
-            <span class="w-14 h-14 shrink-0 rounded-full bg-gradient-to-br from-sky-400 to-emerald-400 flex items-center justify-center text-2xl text-slate-900"><i class="fa-solid fa-user-graduate"></i></span>
-            <div class="min-w-0">
-              <p class="font-bold text-base" data-student="name"></p>
-              <p class="ar text-white/75" data-student="nameAr"></p>
-              <p class="text-white/60 text-xs mt-1">
-                <span data-student="grade"></span> · <span data-student="school"></span>
-              </p>
-              <p class="text-white/60 text-xs">
-                Supervisor <span class="ar">المشرف</span>: <span data-student="teacher"></span> · <span data-student="year"></span>
-              </p>
-            </div>
-          </div>
-
-          <!-- Overview -->
-          <div>
-            <h3 class="font-semibold text-sky-200"><i class="fa-solid fa-lightbulb mr-1.5"></i>Project Overview <span class="ar text-white/60 font-normal">· لمحة عن المشروع</span></h3>
-            <p class="text-white/80 mt-1.5">
-              Many people in Bahrain walk too little, drink too little water and spend long hours on screens, especially in the hot summer months.
-              This IB MYP Design project aims to design a simple digital health tracker that helps students, teachers and community members build better daily habits.
-            </p>
-            <p class="ar text-white/70 mt-1.5">
-              يعاني كثير من أفراد المجتمع في البحرين من قلة المشي وقلة شرب الماء وطول الجلوس أمام الشاشات، خاصة في أشهر الصيف الحارة.
-              يهدف هذا المشروع ضمن مادة التصميم في برنامج السنوات المتوسطة (IB MYP) إلى تصميم تطبيق رقمي بسيط لمتابعة العادات الصحية يساعد الطلاب والمعلمين وأفراد المجتمع على بناء عادات يومية أفضل.
-            </p>
-          </div>
-
-          <!-- Hypotheses -->
-          <div>
-            <h3 class="font-semibold text-emerald-200"><i class="fa-solid fa-flask mr-1.5"></i>Research Hypotheses <span class="ar text-white/60 font-normal">· فرضيات البحث</span></h3>
-            <ul class="mt-1.5 space-y-2 text-white/80">
-              <li class="flex gap-2"><span class="text-emerald-300 font-bold">H1</span>
-                <span>Users prefer a simple numbered menu over complex forms.
-                <span class="ar block text-white/65">يفضّل المستخدمون قائمة مرقّمة بسيطة على النماذج المعقّدة.</span></span></li>
-              <li class="flex gap-2"><span class="text-emerald-300 font-bold">H2</span>
-                <span>Short motivational alerts motivate users more than detailed statistics.
-                <span class="ar block text-white/65">التنبيهات التحفيزية القصيرة تحفّز المستخدمين أكثر من الإحصائيات المفصّلة.</span></span></li>
-            </ul>
-          </div>
-
-          <!-- Design cycle -->
-          <div>
-            <h3 class="font-semibold text-pink-200"><i class="fa-solid fa-arrows-spin mr-1.5"></i>MYP Design Cycle <span class="ar text-white/60 font-normal">· دورة التصميم</span></h3>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2 text-center">
-              <div class="glass rounded-xl p-2.5 ring-1 ring-sky-300/60"><p class="font-bold text-sky-300">A</p><p>Inquiring &amp; Analysing</p><p class="ar text-xs text-white/60">البحث والتحليل</p><p class="text-[10px] text-sky-200 mt-1">← this survey</p></div>
-              <div class="glass rounded-xl p-2.5"><p class="font-bold text-emerald-300">B</p><p>Developing Ideas</p><p class="ar text-xs text-white/60">تطوير الأفكار</p></div>
-              <div class="glass rounded-xl p-2.5"><p class="font-bold text-pink-300">C</p><p>Creating the Solution</p><p class="ar text-xs text-white/60">إنشاء الحل</p></div>
-              <div class="glass rounded-xl p-2.5"><p class="font-bold text-amber-300">D</p><p>Evaluating</p><p class="ar text-xs text-white/60">التقييم</p></div>
-            </div>
-          </div>
-
-          <!-- Privacy -->
-          <p class="text-xs text-white/55 border-t border-white/10 pt-4">
-            <i class="fa-solid fa-shield-halved mr-1"></i>
-            No names or personal data are collected. Results are used only for this school project.
-            <span class="ar block mt-0.5">لا نجمع أي أسماء أو بيانات شخصية، وتُستخدم النتائج لأغراض هذا المشروع المدرسي فقط.</span>
-          </p>
-        </div>
-      </details>
-    </section>
 
     <!-- Survey card -->
     <section id="surveyWrap" class="w-full max-w-2xl glass rounded-3xl p-5 sm:p-8">
@@ -407,19 +330,6 @@
   </main>
 
   <script>
-    // ---------- Student / project details (edit these) ----------
-    const STUDENT = {
-      name: '[Student Name]',
-      nameAr: '[اسم الطالب]',
-      grade: 'MYP Year 5 (Grade 10)',
-      school: '[School Name], Bahrain',
-      teacher: '[Design Teacher]',
-      year: '2026 – 2027',
-    };
-    document.querySelectorAll('[data-student]').forEach(el => {
-      el.textContent = STUDENT[el.dataset.student] || '';
-    });
-
     // ---------- Question data ----------
     const HABIT_QUESTIONS = [
       {

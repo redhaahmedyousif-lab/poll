@@ -3,16 +3,6 @@
 
 **IB MYP Design Project · مشروع تصميم – برنامج السنوات المتوسطة**
 
-| | |
-|---|---|
-| **Student / الطالب** | [Student Name] – [اسم الطالب] |
-| **Grade / الصف** | MYP Year 5 (Grade 10) |
-| **School / المدرسة** | [School Name], Bahrain |
-| **Supervisor / المشرف** | [Design Teacher] |
-| **Academic Year / العام الدراسي** | 2026 – 2027 |
-
----
-
 ## Project Overview
 
 Many people in Bahrain walk too little, drink too little water and spend long hours on screens, especially in the hot summer months. This project aims to design a simple digital health tracker that helps students, teachers and community members build better daily habits.
@@ -62,6 +52,3 @@ No names or personal data are collected. Results are used only for this school p
 ## Technology · التقنيات
 
 Single `index.html` file — Tailwind CSS, Font Awesome, Google Fonts (Inter / Tajawal), and Formspree for collecting responses.
-
-> **To edit the student details** on the web page, change the `STUDENT` object near the top of the `<script>` in `index.html`.
-> **لتعديل بيانات الطالب** في الصفحة، عدّل الكائن `STUDENT` في بداية الـ `<script>` داخل ملف `index.html`.
