@@ -449,7 +449,6 @@
 
       <form id="surveyForm" action="https://formspree.io/f/mwlpnapj" method="POST" novalidate>
         <input type="hidden" name="_subject" value="New IB MYP Health Survey Response (Bahrain)" />
-        <input type="hidden" name="survey_version" value="2" />
         <!-- Honeypot spam trap (Formspree) -->
         <div hidden aria-hidden="true">
           <label>Leave empty <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></label>
@@ -947,6 +946,7 @@
       }
 
       const data = new FormData(form);   // built before inputs are disabled
+      data.append('language_ui', 'English / Arabic');
       data.append('submitted_at', new Date().toISOString());
       const snapshot = answers();
 
