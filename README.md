@@ -51,4 +51,4 @@ No names or personal data are collected. Results are used only for this school p
 
 ## Technology · التقنيات
 
-Single `index.html` file — Tailwind CSS, Font Awesome, Google Fonts (Inter / Tajawal), and Formspree for collecting responses.
+Single `index.html` file (Arabic-first, RTL) — Tailwind CSS v4 browser build, Font Awesome, Google Fonts (IBM Plex Sans Arabic / Inter), and Formspree for collecting responses. Answers are saved as a draft on the device until submitted.
