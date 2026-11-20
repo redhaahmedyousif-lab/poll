@@ -66,6 +66,21 @@
     #headerProgress { transition: width .5s cubic-bezier(.22,1,.36,1); }
     /* Category grids (age, steps, water…) sit two-up on phones; their repeated icon is dropped there to make room */
     @media (max-width: 639px) { .cat-grid .opt-ico { display: none; } .cat-grid .opt label { padding: .75rem; gap: .5rem; } .cat-grid .opt .tick { width: 1.125rem; height: 1.125rem; } }
+    /* Navy hero band (same look as the new design): full-bleed behind the intro, the white cards straddle its lower edge */
+    #hero { position: relative; isolation: isolate; }
+    #hero::before { content: ''; position: absolute; z-index: -1; top: -3rem; bottom: 3.5rem; left: calc(50% - 50vw); right: calc(50% - 50vw);
+      background: radial-gradient(60% 80% at 15% 0%, rgba(16,185,129,.28), transparent 60%), radial-gradient(50% 70% at 95% 10%, rgba(56,189,248,.16), transparent 60%),
+        linear-gradient(165deg, #071629 0%, #0B2140 45%, #0D3550 100%); }
+    #hero::after { content: ''; position: absolute; z-index: -1; top: -3rem; bottom: 3.5rem; left: calc(50% - 50vw); right: calc(50% - 50vw);
+      background-image: radial-gradient(rgba(255,255,255,.09) 1px, transparent 1px); background-size: 18px 18px;
+      -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 95%); mask-image: linear-gradient(to bottom, #000 30%, transparent 95%); }
+    #hero > h2 { color: #fff; }
+    #hero > h2 .bg-clip-text { background-image: linear-gradient(to left, #6EE7B7, #67E8F9); }
+    #hero > p { color: rgba(255,255,255,.78); }
+    #hero > p .text-slate-300 { color: #fff; }
+    #hero .glass { background: #fff; }
+    #hero > span:first-child { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16); color: #6EE7B7; }
+    @media print { #hero::before, #hero::after { display: none; } #hero > h2, #hero > p { color: #000; } }
 
     .lang-btn.active { background: #0B2140; color: #fff; }
     /* English subtitles sit right-aligned in RTL and left-aligned in LTR */
