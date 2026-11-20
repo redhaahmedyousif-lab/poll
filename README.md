@@ -3,7 +3,7 @@
 
 **IB MYP Design Project · Criterion A research survey**
 
-An 18-question bilingual (Arabic / English) survey that gives each participant an instant personal health report (health score, BMI, WHO benchmarks, Bahrain climate tips) and saves the answers to the research Google Sheet.
+An 18-question bilingual (Arabic / English) survey, answered in 5 short steps, that gives each participant an instant personal health report (health score, BMI, WHO benchmarks, Bahrain climate tips) and saves the answers to the research Google Sheet.
 
 استبيان من 18 سؤالاً بالعربية والإنجليزية، يعطي المشارك تقريراً صحياً فورياً، ويحفظ الإجابات في Google Sheet الخاص بالبحث.
 

@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0B2140" />
-  <meta name="format-detection" content="telephone=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bahrain Community Health App | تطبيق صحة مجتمع البحرين</title>
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://script.google.com https://script.googleusercontent.com; object-src 'none'; base-uri 'none'; form-action 'none'" />
@@ -13,86 +11,173 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <meta name="theme-color" content="#0B2140" />
+  <meta name="format-detection" content="telephone=no" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-
   <style>
-    body { font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif; background: #F4F7FB; overflow-x: clip; }
-    html[lang=en] body { font-family: 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif; }
-    /* Hero title: extra line height so the second line (فوراً) doesn't touch the first */
-    #hero h2 { line-height: 1.4; }
-    .glass { background: rgba(255, 255, 255, .94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 1px 2px rgba(11, 33, 64, .04), 0 12px 32px -18px rgba(11, 33, 64, .18); }
-    .grid-bg {
-      background-image:
-        radial-gradient(circle at 12% 0%, rgba(16,185,129,.10), transparent 38%),
-        radial-gradient(circle at 88% 6%, rgba(8,145,178,.08), transparent 40%),
-        linear-gradient(rgba(11,33,64,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(11,33,64,.03) 1px, transparent 1px);
-      background-size: auto, auto, 40px 40px, 40px 40px;
+    /* ---------- tokens (4px spacing scale; radii 10 · 14 · 24) ---------- */
+    :root {
+      --navy-50: #F1F5FA; --navy-100: #E3EAF4; --navy-700: #1D4477; --navy-800: #12315C; --navy-900: #0B2140; --navy-950: #071629;
+      --brand-50: #ECFDF5; --brand-500: #10B981; --brand-600: #059669; --brand-700: #047857;
+      --ink: #0F1B2D; --body: #334155; --muted: #5B6B7F; --line: #E2E8F0; --line-strong: #CBD5E1; --canvas: #F4F7FB;
+      --danger-50: #FEF3F2; --danger-200: #FECDCA; --danger-700: #B42318;
+      --r-option: 14px; --r-card: 24px;
+      --shadow-md: 0 6px 16px -6px rgba(11, 33, 64, .16);
+      --shadow-card: 0 1px 2px rgba(11, 33, 64, .04), 0 18px 40px -16px rgba(11, 33, 64, .22);
+      --ease-out: cubic-bezier(.22, 1, .36, 1); --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+      --step-from: -24px;   /* RTL: the next step enters from the left */
     }
+    html[dir=ltr] { --step-from: 24px; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; scroll-padding-top: 96px; }
+    body { margin: 0; background: var(--canvas); color: var(--body); line-height: 1.6; overflow-x: clip; -webkit-tap-highlight-color: transparent;
+      font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif; }
+    html[lang=en] body { font-family: 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif; }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
+    .sub-en { text-align: start; }
+    html[lang=en] #report .sub-en { display: none; }
+    html[dir=ltr] .text-right { text-align: left; }
+    html[dir=ltr] .flip-x { transform: scaleX(-1); }
+    html[dir=ltr] .flip-x.rotate-180 { transform: none; }
+    .text-slate-950 { color: #fff; } /* text on solid accent backgrounds in the report */
 
-    .opt input:checked + label {
-      border-color: #059669; background: #ECFDF5;
-      box-shadow: 0 0 0 1px #059669, 0 8px 20px -10px rgba(5,150,105,.45);
-    }
-    .opt input:checked + label .tick { opacity: 1; transform: scale(1); }
+    /* ---------- hero ---------- */
+    .hero { position: relative; isolation: isolate; color: #fff; overflow: hidden;
+      background: radial-gradient(60% 80% at 15% 0%, rgba(16,185,129,.28), transparent 60%), radial-gradient(50% 70% at 95% 10%, rgba(56,189,248,.16), transparent 60%),
+        linear-gradient(165deg, var(--navy-950) 0%, var(--navy-900) 45%, #0D3550 100%); }
+    .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background-image: radial-gradient(rgba(255,255,255,.09) 1px, transparent 1px);
+      background-size: 18px 18px; -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 95%); mask-image: linear-gradient(to bottom, #000 30%, transparent 95%); }
+    .chip-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); font-size: 13px; font-weight: 500; color: rgba(255,255,255,.9); }
+    .chip-pill svg { color: #6EE7B7; }
+    .hero-accent { background: linear-gradient(to left, #6EE7B7, #67E8F9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .brand-logo { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0;
+      background: linear-gradient(135deg, #10B981, #0891B2); box-shadow: 0 8px 20px -8px rgba(16,185,129,.6); }
+    .lang-switch { display: inline-flex; padding: 3px; border-radius: 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); font: 700 12px/1 'Inter', sans-serif; }
+    .lang-btn { padding: 7px 10px; border-radius: 9px; color: rgba(255,255,255,.75); transition: background-color .18s, color .18s; }
+    .lang-btn.active { background: #fff; color: var(--navy-900); }
 
-    /* Conditional sub-question: collapses to 0 height via grid rows so the transition works without a fixed height */
+    /* ---------- card + progress ---------- */
+    .card { background: #fff; border: 1px solid rgba(226,232,240,.9); border-radius: var(--r-card); box-shadow: var(--shadow-card); }
+    .progress-head { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.93); -webkit-backdrop-filter: saturate(180%) blur(12px);
+      backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid var(--line); border-radius: var(--r-card) var(--r-card) 0 0; }
+    .seg { flex: 1; height: 6px; border-radius: 999px; background: var(--navy-100); overflow: hidden; }
+    .seg > span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--brand-600), var(--brand-500)); transition: width .5s var(--ease-out); }
+
+    /* ---------- steps ---------- */
+    .step { display: none; }
+    .step.is-active { display: block; animation: stepIn .42s var(--ease-out) both; }
+    .step.is-active.is-back { animation-name: stepInBack; }
+    @keyframes stepIn { from { opacity: 0; transform: translateX(var(--step-from)); } to { opacity: 1; transform: none; } }
+    @keyframes stepInBack { from { opacity: 0; transform: translateX(calc(var(--step-from) * -1)); } to { opacity: 1; transform: none; } }
+    .step-head { margin-bottom: 24px; }
+    .step-title { font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1.3; outline: none; }
+    .step-en { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); margin-top: 2px; }
+    @media (min-width: 640px) { .step-title { font-size: 24px; } }
+
+    /* ---------- questions ---------- */
+    .q { border: 0; margin: 0; padding: 0; min-width: 0; }
+    .q legend, .q > .q-label { float: inline-start; width: 100%; padding: 0; margin-bottom: 14px; }
+    .q legend + *, .q > .q-label + * { clear: both; }
+    .q { margin-top: 28px; padding-top: 28px; border-top: 1px dashed var(--line); }
+    .step-head + .q, .note + .q, .step-head + .q-mount > .q:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+    .q-head { display: flex; align-items: flex-start; gap: 12px; }
+    .q-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--navy-50); color: var(--navy-700);
+      font: 600 13px/1 'Inter', sans-serif; transition: background-color .2s, color .2s; }
+    .q.is-answered .q-num { background: var(--brand-600); color: #fff; }
+    .q-title { font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.45; }
+    .q-title small { font-size: 13px; font-weight: 400; color: var(--muted); }
+    .hint { font-size: 13px; color: var(--muted); line-height: 1.55; }
+    .note { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-option); font-size: 14px; line-height: 1.65; }
+    .note--brand { background: var(--brand-50); color: #065F46; border: 1px solid #A7F3D0; }
+    .note--navy { background: var(--navy-50); color: var(--navy-800); }
+    .note svg { flex-shrink: 0; margin-top: 2px; }
+    .err:not(.hidden) { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 9px 12px; border-radius: 10px;
+      background: var(--danger-50); color: var(--danger-700); font-size: 13.5px; font-weight: 500; }
+    .is-shaking { animation: shake .4s ease; }
+    @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+    /* ---------- text inputs ---------- */
+    .field { width: 100%; height: 50px; padding: 0 16px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink);
+      font: inherit; font-size: 16px; transition: border-color .18s, box-shadow .18s; }
+    textarea.field { height: auto; padding: 12px 16px; line-height: 1.6; resize: vertical; }
+    .field::placeholder { color: #94A3B8; }
+    .field:hover { border-color: var(--line-strong); }
+    .field:focus { outline: none; border-color: var(--brand-600); box-shadow: 0 0 0 3px rgba(5,150,105,.15); }
+    .field[aria-invalid=true], .field.border-rose-500 { border-color: #F97066; }
+    .field.has-unit { padding-inline-end: 56px; }
+    .field-unit { position: absolute; inset-inline-end: 14px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--muted); pointer-events: none; }
+
+    /* ---------- option cards ---------- */
+    .opt { position: relative; min-width: 0; }
+    .opt-box { position: relative; display: flex; align-items: center; gap: 12px; height: 100%; min-height: 60px; padding: 12px 14px; cursor: pointer;
+      background: #fff; border: 1.5px solid var(--line); border-radius: var(--r-option);
+      transition: border-color .18s, background-color .18s, box-shadow .18s, transform .18s var(--ease-out); }
+    @media (hover: hover) { .opt-box:hover { border-color: var(--line-strong); box-shadow: var(--shadow-md); transform: translateY(-1px); } }
+    .opt-box:active { transform: scale(.985); }
+    .opt input:focus-visible + .opt-box { outline: 3px solid rgba(29,68,119,.35); outline-offset: 2px; }
+    .opt input:checked + .opt-box { border-color: var(--brand-600); background: var(--brand-50); box-shadow: 0 0 0 3px rgba(5,150,105,.12); }
+    .q:has(.err:not(.hidden)) .opt-box { border-color: var(--danger-200); }
+    .opt-icon { flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--navy-50); color: var(--navy-700);
+      transition: background-color .18s, color .18s; }
+    .opt input:checked + .opt-box .opt-icon { background: var(--brand-600); color: #fff; }
+    .opt-ar { display: block; font-weight: 600; color: var(--ink); font-size: 15.5px; line-height: 1.45; }
+    .opt-desc { display: block; font-size: 13px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
+    .dot { flex-shrink: 0; width: 22px; height: 22px; border-radius: 999px; border: 2px solid var(--line-strong); background: #fff; display: grid; place-items: center; transition: border-color .18s; }
+    .dot::after { content: ""; width: 10px; height: 10px; border-radius: 999px; background: var(--brand-600); transform: scale(0); transition: transform .22s var(--ease-spring); }
+    .opt input:checked + .opt-box .dot { border-color: var(--brand-600); }
+    .opt input:checked + .opt-box .dot::after { transform: scale(1); }
+    .opt-tick { display: none; }
+    /* category ranges (age, steps, water…): compact centred cards, two-up */
+    .cat-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (min-width: 640px) { .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .cat-grid .opt-box { flex-direction: column; justify-content: center; text-align: center; gap: 0; padding: 20px 10px 14px; min-height: 76px; }
+    .cat-grid .opt-icon, .cat-grid .dot { display: none; }
+    .cat-grid .opt-tick { position: absolute; top: 7px; inset-inline-start: 7px; width: 18px; height: 18px; border-radius: 999px; display: grid; place-items: center;
+      background: var(--brand-600); color: #fff; opacity: 0; transform: scale(.4); transition: opacity .18s, transform .25s var(--ease-spring); }
+    .cat-grid .opt input:checked + .opt-box .opt-tick { opacity: 1; transform: scale(1); }
+    .cat-grid .opt-ar { font-size: 15px; }
+    .cat-grid .opt-box > .flex-1 { flex: 0 0 auto; } /* keep the label centred vertically */
+
+    /* ---------- conditional sub-questions (from the original survey) ---------- */
     .reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transform: translateY(-6px);
       transition: grid-template-rows .4s cubic-bezier(.2,.8,.2,1), opacity .3s ease, transform .4s cubic-bezier(.2,.8,.2,1); }
     .reveal.open { grid-template-rows: 1fr; opacity: 1; transform: none; }
     .reveal > div { min-height: 0; overflow: hidden; }
-
-    .chip input:checked + label { background: #059669; color: #fff; border-color: #059669; box-shadow: 0 6px 16px -8px rgba(5,150,105,.6); }
-    .chip input:focus-visible + label { outline: 3px solid rgba(8,145,178,.45); outline-offset: 2px; }
-    .suggest.active { background: #059669; color: #fff; border-color: #059669; }
-    .opt input:focus-visible + label { outline: 3px solid rgba(8,145,178,.45); outline-offset: 2px; }
-    /* Smooth, consistent interaction states for option cards */
-    .opt label { transition: border-color .18s, background-color .18s, box-shadow .18s, transform .18s cubic-bezier(.22,1,.36,1); }
-    @media (hover: hover) { .opt label:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -10px rgba(11,33,64,.25); } }
-    .opt label:active { transform: scale(.985); }
-    .opt input:checked + label .opt-ico { background: #059669; color: #fff; }
-    .chip label, .suggest { transition: background-color .18s, border-color .18s, color .18s, transform .12s; }
+    .sub-panel { margin-top: 12px; padding: 16px; border-radius: var(--r-option); background: var(--brand-50); border: 1px solid #A7F3D0; }
+    .sub-panel--other { background: #F5F3FF; border-color: #DDD6FE; }
+    .sub-label { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px; font-weight: 700; color: #065F46; }
+    .sub-panel--other .sub-label { color: #5B21B6; }
+    .chip label, .suggest { display: inline-block; cursor: pointer; border-radius: 10px; border: 1.5px solid var(--line-strong); background: #fff; color: var(--ink);
+      padding: 7px 14px; font-size: 14px; font-weight: 600; transition: background-color .18s, border-color .18s, color .18s, transform .12s; }
+    .suggest { padding: 6px 12px; font-size: 13px; font-family: 'Inter', 'IBM Plex Sans Arabic', sans-serif; }
+    .chip label:hover, .suggest:hover { border-color: var(--brand-600); }
     .chip label:active, .suggest:active { transform: scale(.97); }
-    /* Text placed on solid accent backgrounds (buttons, ticks, logo) */
-    .text-slate-950 { color: #fff; }
-    /* Section headings that group the 18 questions */
-    .sec-head { display: flex; align-items: center; gap: .75rem; padding-top: .25rem; }
-    .sec-head .sec-ico { width: 2.25rem; height: 2.25rem; border-radius: .75rem; display: grid; place-items: center; background: #0B2140; color: #fff; flex-shrink: 0; }
-    .sec-head::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
-    #headerProgress { transition: width .5s cubic-bezier(.22,1,.36,1); }
-    /* Category grids (age, steps, water…) sit two-up on phones; their repeated icon is dropped there to make room */
-    @media (max-width: 639px) { .cat-grid .opt-ico { display: none; } .cat-grid .opt label { padding: .75rem; gap: .5rem; } .cat-grid .opt .tick { width: 1.125rem; height: 1.125rem; } }
-    /* Navy hero band (same look as the new design): full-bleed behind the intro, the white cards straddle its lower edge */
-    #hero { position: relative; isolation: isolate; }
-    #hero::before { content: ''; position: absolute; z-index: -1; top: -3rem; bottom: 3.5rem; left: calc(50% - 50vw); right: calc(50% - 50vw);
-      background: radial-gradient(60% 80% at 15% 0%, rgba(16,185,129,.28), transparent 60%), radial-gradient(50% 70% at 95% 10%, rgba(56,189,248,.16), transparent 60%),
-        linear-gradient(165deg, #071629 0%, #0B2140 45%, #0D3550 100%); }
-    #hero::after { content: ''; position: absolute; z-index: -1; top: -3rem; bottom: 3.5rem; left: calc(50% - 50vw); right: calc(50% - 50vw);
-      background-image: radial-gradient(rgba(255,255,255,.09) 1px, transparent 1px); background-size: 18px 18px;
-      -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 95%); mask-image: linear-gradient(to bottom, #000 30%, transparent 95%); }
-    #hero > h2 { color: #fff; }
-    #hero > h2 .bg-clip-text { background-image: linear-gradient(to left, #6EE7B7, #67E8F9); }
-    #hero > p { color: rgba(255,255,255,.78); }
-    #hero > p .text-slate-300 { color: #fff; }
-    #hero .glass { background: #fff; }
-    #hero > span:first-child { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16); color: #6EE7B7; }
-    @media print { #hero::before, #hero::after { display: none; } #hero > h2, #hero > p { color: #000; } }
+    .chip input:checked + label, .suggest.active { background: var(--brand-600); color: #fff; border-color: var(--brand-600); box-shadow: 0 6px 16px -8px rgba(5,150,105,.6); }
+    .chip input:focus-visible + label { outline: 3px solid rgba(29,68,119,.35); outline-offset: 2px; }
 
-    .lang-btn.active { background: #0B2140; color: #fff; }
-    /* English subtitles sit right-aligned in RTL and left-aligned in LTR */
-    .sub-en { text-align: start; }
-    /* In English the card titles are already English, so the secondary (Arabic) subtitle is hidden */
-    html[lang=en] #report .sub-en { display: none; }
-    html[dir=ltr] .text-right { text-align: left; }
-    /* Report watermark: faint, rotated, repeating; above the cards but never blocks clicks or reading */
+    /* ---------- buttons ---------- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 8px 22px; border: 0; border-radius: 12px;
+      font: inherit; font-weight: 600; font-size: 16px; line-height: 1.3; cursor: pointer; user-select: none; transition: background-color .18s, box-shadow .18s, transform .12s; }
+    .btn:active:not(:disabled) { transform: scale(.98); }
+    .btn:focus-visible { outline: 3px solid rgba(29,68,119,.4); outline-offset: 2px; }
+    .btn:disabled { cursor: wait; opacity: .7; }
+    .btn-primary { background: var(--navy-900); color: #fff; box-shadow: 0 8px 20px -8px rgba(11,33,64,.55); }
+    .btn-primary:hover:not(:disabled) { background: var(--navy-800); }
+    .btn-success { background: var(--brand-600); color: #fff; box-shadow: 0 8px 20px -8px rgba(5,150,105,.6); }
+    .btn-success:hover:not(:disabled) { background: var(--brand-700); }
+    .btn-ghost { background: transparent; color: var(--navy-800); }
+    @media (max-width: 479px) { .nav-bar .btn-ghost { padding-inline: 10px; } #submitBtn { padding-inline: 14px; } }
+    .btn-ghost:hover { background: var(--navy-50); }
+    .nav-bar { position: sticky; bottom: 0; z-index: 20; background: rgba(255,255,255,.95); -webkit-backdrop-filter: saturate(180%) blur(12px); backdrop-filter: saturate(180%) blur(12px);
+      border-top: 1px solid var(--line); border-radius: 0 0 var(--r-card) var(--r-card); padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+
+    /* ---------- loader + report (from the original survey) ---------- */
+    .glass { background: #fff; border-color: var(--line) !important; box-shadow: var(--shadow-card); }
     #report { position: relative; }
     .report-watermark { position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: .05; background-repeat: repeat; background-size: 460px 240px; }
-
-    /* Loader */
     .orbit { animation: spin 2.4s linear infinite; }
     .orbit-rev { animation: spin 3.6s linear infinite reverse; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -100,258 +185,235 @@
     @keyframes pulse { 0%,100% { transform: scale(.9); opacity: .75 } 50% { transform: scale(1.08); opacity: 1 } }
     .scan { animation: scan 1.8s ease-in-out infinite; }
     @keyframes scan { 0% { transform: translateY(-100%) } 100% { transform: translateY(400%) } }
-
     .fade-up { animation: fadeUp .7s cubic-bezier(.2,.8,.2,1) both; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
-
     .bar-fill { transition: width 1.4s cubic-bezier(.2,.8,.2,1); }
     .ring-fg { transition: stroke-dashoffset 1.8s cubic-bezier(.2,.8,.2,1), stroke .4s; }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
     }
     @media print {
       body { background: #fff !important; color: #000 !important; }
-      header, footer, #formSection, .no-print { display: none !important; }
-      .glass { background: #fff !important; border-color: #ddd !important; }
+      .hero, footer, #formSection, .no-print { display: none !important; }
+      main { margin-top: 0 !important; }
+      .glass { background: #fff !important; border-color: #ddd !important; box-shadow: none; }
     }
   </style>
 </head>
 
-<body class="min-h-screen text-slate-200 antialiased grid-bg selection:bg-emerald-500/30">
+<body class="min-h-screen antialiased">
+  <a href="#formSection" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:start-3 focus:z-50 focus:rounded-lg focus:bg-slate-900 focus:px-4 focus:py-2 focus:shadow">تخطَّ إلى الاستبيان</a>
 
-  <!-- ============ HEADER ============ -->
-  <header class="sticky top-0 z-40 border-b border-slate-800/80 glass">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="w-11 h-11 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 grid place-items-center shadow-lg shadow-emerald-500/20">
-          <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h4l3-8 4 16 3-8h4"/>
-          </svg>
+  <!-- ============ HERO ============ -->
+  <div class="hero">
+    <div class="max-w-2xl mx-auto px-4 pt-5 pb-28 sm:pb-32">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="brand-logo"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h4l3-8 4 16 3-8h4"/></svg></span>
+          <div class="min-w-0 leading-tight">
+            <h1 class="font-bold text-[15px] sm:text-base text-white truncate">تطبيق صحة مجتمع البحرين</h1>
+            <p class="text-[12px] text-white/60 sub-en" data-en="تطبيق صحة مجتمع البحرين">Bahrain Community Health App</p>
+          </div>
         </div>
-        <div class="min-w-0">
-          <h1 class="font-extrabold text-base sm:text-lg leading-tight truncate">تطبيق صحة مجتمع البحرين</h1>
-          <p class="text-[11px] sm:text-xs text-slate-400 tracking-wide sub-en" data-en="تطبيق صحة مجتمع البحرين">Bahrain Community Health App</p>
+        <div class="lang-switch" role="group" aria-label="تبديل اللغة" dir="ltr">
+          <button type="button" class="lang-btn" data-lang="ar">AR</button>
+          <button type="button" class="lang-btn" data-lang="en">EN</button>
         </div>
       </div>
-      <div class="flex items-center gap-2 shrink-0">
-      <div class="inline-flex rounded-xl border border-slate-700 bg-slate-900 p-1 text-xs font-bold" role="group" aria-label="تبديل اللغة" dir="ltr">
-        <button type="button" class="lang-btn rounded-lg px-2.5 py-1 transition" data-lang="ar">AR</button>
-        <button type="button" class="lang-btn rounded-lg px-2.5 py-1 transition" data-lang="en">EN</button>
-      </div>
-      <span class="hidden sm:inline-flex shrink-0 items-center gap-1.5 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-1 text-[10px] sm:text-xs font-bold text-cyan-300" dir="ltr">
-        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-        IB MYP Criterion A Research
-      </span>
-      </div>
+
+      <section id="hero" class="text-center mt-10 sm:mt-12">
+        <span class="chip-pill mb-5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6m-5 0v6L4.5 18.5A1.7 1.7 0 006 21h12a1.7 1.7 0 001.5-2.5L14 9V3"/></svg>
+          استبيان بحثي · دقيقتان فقط
+        </span>
+        <h2 class="text-[28px] leading-[1.35] sm:text-[40px] sm:leading-[1.25] font-bold tracking-tight text-white">
+          شارك بياناتك… <span class="hero-accent">واحصل على تقريرك الصحي فوراً</span>
+        </h2>
+        <p class="mt-4 mx-auto max-w-md text-[15px] leading-relaxed text-white/80">وبالمقابل، تحصل على تحليل شخصي فوري لنشاطك اليومي.</p>
+        <ul class="mt-6 flex flex-wrap justify-center gap-2" aria-label="معلومات الاستبيان">
+          <li class="chip-pill"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2M12 3a9 9 0 100 18 9 9 0 000-18z"/></svg> دقيقتان</li>
+          <li class="chip-pill"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg> 18 سؤالاً</li>
+          <li class="chip-pill"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6c-2.5 4.65-9.5 9-9.5 9z"/></svg> تقرير صحي فوري</li>
+        </ul>
+      </section>
     </div>
-    <div class="h-1 bg-slate-800 no-print" aria-hidden="true"><div id="headerProgress" class="h-full w-0 bg-gradient-to-l from-emerald-500 to-cyan-500"></div></div>
-  </header>
+  </div>
 
-  <main class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
+  <main class="relative z-10 max-w-2xl mx-auto -mt-20 px-4 pb-10">
 
-    <!-- ============ HERO ============ -->
-    <section id="hero" class="text-center mb-10 fade-up">
-      <span class="inline-block mb-4 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-4 py-1 text-xs font-bold text-emerald-300">استبيان بحثي · دقيقتان فقط</span>
-      <h2 class="text-3xl sm:text-5xl font-black leading-tight mb-4">
-        شارك بياناتك… <span class="bg-gradient-to-l from-emerald-400 to-cyan-400 bg-clip-text text-transparent">واحصل على تقريرك الصحي فوراً</span>
-      </h2>
-      <p class="text-slate-400 max-w-2xl mx-auto leading-relaxed">
-        هذا الاستبيان مخصص لجمع البيانات وتحليلها لمشروع بحثي نهائي يقدمه طالب ضمن برنامج IB MYP (المعيار A). جميع البيانات تُستخدم لغرض تطوير نموذج التطبيق ولا تُشارك مع أي طرف ثالث.
-        <span class="block mt-2 text-slate-300">وبالمقابل، تحصل على تحليل شخصي فوري لنشاطك اليومي.</span>
-      </p>
-
-      <div class="grid sm:grid-cols-2 gap-4 mt-8 text-right">
-        <div class="glass rounded-2xl border border-slate-800 p-5 flex gap-4">
-          <div class="w-10 h-10 shrink-0 rounded-xl bg-cyan-500/15 text-cyan-300 grid place-items-center">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5m0 14h16M8 15v-4m4 4V8m4 7v-6"/></svg>
+    <!-- ============ SURVEY ============ -->
+    <section id="formSection">
+      <div class="card">
+        <div class="progress-head px-5 sm:px-8 pt-4 pb-4">
+          <div class="flex items-center justify-between gap-3 text-sm">
+            <p class="font-semibold text-slate-100 min-w-0 truncate"><span id="stepCounter"></span><span id="stepName" class="font-medium text-slate-400"></span></p>
+            <p id="remaining" class="shrink-0 font-medium text-slate-400" aria-live="polite"></p>
           </div>
-          <div>
-            <h3 class="font-bold text-slate-100 mb-1">ما يستفيده الباحث</h3>
-            <p class="text-sm text-slate-400 leading-relaxed">بيانات منظّمة لتحليل احتياجات المستخدمين (المعيار A) ولتطوير نموذج تحليل بلغة Python.</p>
+          <div id="progressbar" class="mt-3 flex gap-1.5" role="progressbar" aria-label="تقدّم الاستبيان" aria-valuemin="0" aria-valuemax="17" aria-valuenow="0">
+            <span class="seg"><span></span></span><span class="seg"><span></span></span><span class="seg"><span></span></span><span class="seg"><span></span></span><span class="seg"><span></span></span>
           </div>
         </div>
-        <div class="glass rounded-2xl border border-slate-800 p-5 flex gap-4">
-          <div class="w-10 h-10 shrink-0 rounded-xl bg-emerald-500/15 text-emerald-300 grid place-items-center">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6c-2.5 4.65-9.5 9-9.5 9z"/></svg>
+
+        <form id="surveyForm" novalidate>
+          <div class="px-5 sm:px-8 pt-6 pb-8">
+
+            <!-- ===== STEP 1 · Q1–5 ===== -->
+            <section class="step" data-step="1" aria-labelledby="step-title-1">
+              <header class="step-head"><h2 id="step-title-1" tabindex="-1" class="step-title">بياناتك الأساسية</h2><p class="sub-en step-en" data-en="بياناتك الأساسية">About you</p></header>
+              <div role="note" class="note note--brand mb-7">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 11V8a5 5 0 0110 0v3M6 11h12a1 1 0 011 1v8a1 1 0 01-1 1H6a1 1 0 01-1-1v-8a1 1 0 011-1zm6 4v2"/></svg>
+                <div><p class="font-bold">خصوصية بياناتك</p><p>جميع الإجابات تُسجَّل وتُحفظ سرّياً لأغراض البحث العلمي والتحليل الإحصائي لمشروع IB MYP Design فقط، دون جمع أي بيانات شخصية معرفة.</p></div>
+              </div>
+
+              <div class="q">
+                <label for="user_name" class="q-label"><span class="q-head"><span class="q-num">1</span><span class="q-title">الاسم أو الاسم المستعار</span></span></label>
+                <input id="user_name" name="user_name" type="text" maxlength="40" autocomplete="nickname" required placeholder="مثال: أحمد أو Runner_BH" class="field" />
+                <p class="err hidden" data-for="user_name">يرجى إدخال اسم أو اسم مستعار.</p>
+              </div>
+
+              <fieldset class="q">
+                <legend><span class="q-head"><span class="q-num">2</span><span class="q-title">الجنس</span></span></legend>
+                <div class="grid grid-cols-2 gap-2.5" id="genderGroup"></div>
+                <p class="err hidden" data-for="gender">يرجى اختيار الجنس.</p>
+              </fieldset>
+
+              <!-- 3. Age (category → exact age) — rendered from CONDITIONALS -->
+              <div id="ageQ" class="q-mount"></div>
+
+              <div class="q">
+                <div class="grid sm:grid-cols-2 gap-x-4 gap-y-6">
+                  <div>
+                    <label for="height" class="q-label block mb-3.5"><span class="q-head"><span class="q-num">4</span><span class="q-title">الطول بالضبط</span></span></label>
+                    <div class="relative">
+                      <input id="height" name="height" type="number" inputmode="decimal" min="100" max="230" step="0.5" required placeholder="مثال: 170" class="field has-unit" />
+                      <span class="field-unit">سم</span>
+                    </div>
+                    <p class="err hidden" data-for="height">الطول بالسنتيمتر بين 100 و 230.</p>
+                  </div>
+                  <div>
+                    <label for="weight" class="q-label block mb-3.5"><span class="q-head"><span class="q-num">5</span><span class="q-title">الوزن بالضبط</span></span></label>
+                    <div class="relative">
+                      <input id="weight" name="weight" type="number" inputmode="decimal" min="25" max="250" step="0.1" required placeholder="مثال: 65" class="field has-unit" />
+                      <span class="field-unit">كجم</span>
+                    </div>
+                    <p class="err hidden" data-for="weight">الوزن بالكيلوجرام بين 25 و 250.</p>
+                  </div>
+                </div>
+                <p class="hint mt-3">الطول والوزن قياسان دقيقان بطبيعتهما، لذلك يُكتبان مباشرة دون فئات.</p>
+                <p class="err hidden" data-for="bmi">الطول والوزن غير منطقيين معاً — تأكد أن الطول بالسنتيمتر (مثل 170) والوزن بالكيلوجرام.</p>
+                <div id="bmiPreview" class="hidden mt-3 rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm flex flex-wrap items-center gap-x-3 gap-y-1" aria-live="polite"></div>
+              </div>
+            </section>
+
+            <!-- ===== STEP 2 · Q6–8 ===== -->
+            <section class="step" data-step="2" aria-labelledby="step-title-2">
+              <header class="step-head"><h2 id="step-title-2" tabindex="-1" class="step-title">نشاطك اليومي</h2><p class="sub-en step-en" data-en="نشاطك اليومي">Your daily activity</p></header>
+              <div id="stepsQ" class="q-mount"></div>
+              <div id="waterQ" class="q-mount"></div>
+              <div id="screenQ" class="q-mount"></div>
+            </section>
+
+            <!-- ===== STEP 3 · Q9–12 ===== -->
+            <section class="step" data-step="3" aria-labelledby="step-title-3">
+              <header class="step-head"><h2 id="step-title-3" tabindex="-1" class="step-title">نمط حياتك</h2><p class="sub-en step-en" data-en="نمط حياتك">Your lifestyle</p></header>
+              <div id="conditionalQuestions" class="q-mount"></div>
+            </section>
+
+            <!-- ===== STEP 4 · Q13–14 ===== -->
+            <section class="step" data-step="4" aria-labelledby="step-title-4">
+              <header class="step-head"><h2 id="step-title-4" tabindex="-1" class="step-title">تحدياتك وأهدافك</h2><p class="sub-en step-en" data-en="تحدياتك وأهدافك">Challenges & goals</p></header>
+              <fieldset class="q">
+                <legend><span class="q-head"><span class="q-num">13</span><span class="q-title">ما أكبر تحدٍّ يمنعك من نمط حياة نشط؟</span></span></legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="challengeGroup"></div>
+                <p class="err hidden" data-for="main_challenge">يرجى اختيار التحدي الرئيسي.</p>
+              </fieldset>
+              <fieldset class="q">
+                <legend><span class="q-head"><span class="q-num">14</span><span class="q-title">ما هدفك الصحي الرئيسي؟</span></span></legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="goalGroup"></div>
+                <p class="err hidden" data-for="main_goal">يرجى اختيار هدفك الصحي.</p>
+              </fieldset>
+            </section>
+
+            <!-- ===== STEP 5 · Q15–18 ===== -->
+            <section class="step" data-step="5" aria-labelledby="step-title-5">
+              <header class="step-head"><h2 id="step-title-5" tabindex="-1" class="step-title">تطبيقك المثالي</h2><p class="sub-en step-en" data-en="تطبيقك المثالي">Your ideal app</p></header>
+              <fieldset class="q">
+                <legend><span class="q-head"><span class="q-num">15</span><span class="q-title">ما الميزة التي ستحفّزك أكثر لاستخدام التطبيق؟</span></span></legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="featureGroup"></div>
+                <p class="err hidden" data-for="preferred_feature">يرجى اختيار الميزة المفضلة.</p>
+              </fieldset>
+              <fieldset class="q">
+                <legend><span class="q-head"><span class="q-num">16</span><span class="q-title">أي أسلوب تطبيق يناسب شخصيتك أكثر؟</span></span></legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="styleGroup"></div>
+                <p class="err hidden" data-for="preferred_system_style">يرجى اختيار أسلوب النظام المفضّل.</p>
+              </fieldset>
+
+              <!-- 17. Current health app — rendered from CONDITIONALS -->
+              <div id="appQuestions" class="q-mount"></div>
+
+              <!-- 18. Wild idea (optional) -->
+              <div class="q">
+                <label for="wild_idea" class="q-label"><span class="q-head"><span class="q-num">18</span><span class="q-title">لو تقدر تضيف ميزة واحدة غريبة أو مبتكرة تجعلك تستخدم التطبيق يومياً.. ويش بتكون؟ <small>(اختياري)</small></span></span></label>
+                <textarea id="wild_idea" name="wild_idea" rows="3" maxlength="500" class="field"
+                  placeholder="مثال: الخطوات تفتح لي خصم قهوة، أو التطبيق يطلع لي مسار مشي مكيّف قريب لما الجو حار…"></textarea>
+                <div class="flex justify-between gap-3 hint mt-2">
+                  <span>💡 أفكارك تُدرس مباشرة في مرحلة توليد الأفكار للمشروع (المعيار B).</span>
+                  <span id="ideaCount" dir="ltr" class="shrink-0">0 / 500</span>
+                </div>
+              </div>
+
+              <!-- consent -->
+              <div class="note note--navy mt-8">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/></svg>
+                <div class="space-y-2">
+                  <p class="font-medium">هذا الاستبيان مخصص لجمع البيانات وتحليلها لمشروع بحثي نهائي يقدمه طالب ضمن برنامج IB MYP (المعيار A). جميع البيانات تُستخدم لغرض تطوير نموذج التطبيق ولا تُشارك مع أي طرف ثالث.</p>
+                  <p>بإرسال النموذج، توافق على استخدام إجاباتك <b>لأغراض بحثية تعليمية فقط</b>. لا نطلب أي بيانات تعريفية، ويمكنك استخدام اسم مستعار. يُستخدم العمر والجنس والطول والوزن لحساب مؤشر كتلة الجسم وتحليل العينة إحصائياً فقط. التقرير لا يُغني عن استشارة الطبيب.</p>
+                  <p>مساهمتك تساعد الطالب الباحث في تحليل الاحتياجات الفعلية لمجتمع البحرين وتصميم الحل المناسب.</p>
+                </div>
+              </div>
+
+              <!-- honeypot: hidden from people, bots tend to fill it; a filled honeypot means nothing is sent -->
+              <div aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap">
+                <label for="_gotcha">اترك هذا الحقل فارغاً</label>
+                <input id="_gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+            </section>
           </div>
-          <div>
-            <h3 class="font-bold text-slate-100 mb-1">ما تستفيده أنت</h3>
-            <p class="text-sm text-slate-400 leading-relaxed">مقارنة بمعايير منظمة الصحة العالمية، تشخيص للأسباب، نصائح مناخية للبحرين، ودرجة صحية فورية.</p>
+
+          <!-- navigation -->
+          <div class="nav-bar px-5 sm:px-8 pt-4 flex items-center gap-3">
+            <button type="button" id="prevBtn" class="btn btn-ghost" hidden>
+              <svg class="w-4 h-4 flip-x rotate-180" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+              <span>السابق</span>
+            </button>
+            <button type="button" id="nextBtn" class="btn btn-primary flex-1 sm:flex-none sm:min-w-[11rem] ms-auto">
+              <span>التالي</span>
+              <svg class="w-4 h-4 flip-x" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button id="submitBtn" type="submit" class="btn btn-success flex-1 sm:flex-none ms-auto !text-[15px]" hidden>
+              حلّل بياناتي واحصل على التقرير
+            </button>
           </div>
+        </form>
+      </div>
+
+      <!-- about -->
+      <div class="grid sm:grid-cols-2 gap-3 mt-6">
+        <div class="card p-5 flex gap-4">
+          <span class="opt-icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5m0 14h16M8 15v-4m4 4V8m4 7v-6"/></svg></span>
+          <div><h3 class="font-bold text-slate-100 mb-1">ما يستفيده الباحث</h3><p class="text-sm text-slate-400 leading-relaxed">بيانات منظّمة لتحليل احتياجات المستخدمين (المعيار A) ولتطوير نموذج تحليل بلغة Python.</p></div>
+        </div>
+        <div class="card p-5 flex gap-4">
+          <span class="opt-icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6c-2.5 4.65-9.5 9-9.5 9z"/></svg></span>
+          <div><h3 class="font-bold text-slate-100 mb-1">ما تستفيده أنت</h3><p class="text-sm text-slate-400 leading-relaxed">مقارنة بمعايير منظمة الصحة العالمية، تشخيص للأسباب، نصائح مناخية للبحرين، ودرجة صحية فورية.</p></div>
         </div>
       </div>
-    </section>
-
-    <!-- ============ FORM ============ -->
-    <section id="formSection" class="fade-up" style="animation-delay:.1s">
-      <form id="surveyForm" novalidate class="glass rounded-3xl border border-slate-800 p-5 sm:p-8 space-y-8">
-
-        <!-- privacy notice -->
-        <div role="note" class="relative overflow-hidden flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-gradient-to-l from-emerald-500/10 to-cyan-500/5 px-4 pt-4 pb-3.5">
-          <span class="absolute inset-x-0 top-0 h-1 bg-gradient-to-l from-emerald-400 via-cyan-400 to-emerald-400" aria-hidden="true"></span>
-          <span class="w-9 h-9 shrink-0 rounded-xl bg-emerald-500/15 text-emerald-300 grid place-items-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 11V8a5 5 0 0110 0v3M6 11h12a1 1 0 011 1v8a1 1 0 01-1 1H6a1 1 0 01-1-1v-8a1 1 0 011-1zm6 4v2"/></svg></span>
-          <div>
-            <p class="font-bold text-emerald-200 text-sm mb-0.5">خصوصية بياناتك</p>
-            <p class="text-sm text-slate-300 leading-relaxed">جميع الإجابات تُسجَّل وتُحفظ سرّياً لأغراض البحث العلمي والتحليل الإحصائي لمشروع IB MYP Design فقط، دون جمع أي بيانات شخصية معرفة.</p>
-          </div>
-        </div>
-
-        <!-- student notice -->
-        <div role="note" class="flex items-start gap-3 rounded-2xl border border-cyan-500/25 bg-cyan-500/[.07] px-4 py-3 text-sm text-cyan-100/90 leading-relaxed">
-          <svg class="w-5 h-5 shrink-0 text-cyan-400 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6m-6-8.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg>
-          <p>مساهمتك تساعد الطالب الباحث في تحليل الاحتياجات الفعلية لمجتمع البحرين وتصميم الحل المناسب.</p>
-        </div>
-
-        <!-- progress -->
-        <div>
-          <div class="flex justify-between text-xs text-slate-400 mb-2">
-            <span>نسبة الإكمال</span><span id="progressText">0%</span>
-          </div>
-          <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
-            <div id="progressBar" class="h-full w-0 bg-gradient-to-l from-emerald-400 to-cyan-400 transition-all duration-500"></div>
-          </div>
-        </div>
-
-        <div class="sec-head" role="presentation"><span class="sec-ico"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg></span><span><span class="block font-bold text-slate-100 leading-tight">بياناتك الأساسية</span><span class="block text-xs text-slate-400">الأسئلة 1 – 5</span></span></div>
-
-        <!-- 1. Name -->
-        <div>
-          <label for="user_name" class="flex items-center gap-2 font-bold mb-2">
-            <span class="step-num">1</span> الاسم أو الاسم المستعار
-          </label>
-          <input id="user_name" name="user_name" type="text" maxlength="40" autocomplete="nickname" required
-            placeholder="مثال: أحمد أو Runner_BH"
-            class="w-full rounded-xl bg-slate-900/80 border border-slate-700 px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition" />
-          <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="user_name">يرجى إدخال اسم أو اسم مستعار.</p>
-        </div>
-
-        <!-- 2–5. Biometrics -->
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-4 sm:p-5 space-y-5">
-          <div class="flex items-center gap-2 text-sm font-bold text-cyan-300">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4a2 2 0 100 4 2 2 0 000-4zM7 21l2-9-3-1 1-3h10l1 3-3 1 2 9M10 15h4"/></svg>
-            البيانات البيومترية <span class="text-xs font-normal text-slate-500">لحساب مؤشر كتلة الجسم (BMI)</span>
-          </div>
-
-          <fieldset>
-            <legend class="flex items-center gap-2 font-bold mb-3"><span class="step-num">2</span> الجنس</legend>
-            <div class="grid grid-cols-2 gap-2.5" id="genderGroup"></div>
-            <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="gender">يرجى اختيار الجنس.</p>
-          </fieldset>
-
-          <!-- 3. Age (category → exact age) — rendered from CONDITIONALS -->
-          <div id="ageQ"></div>
-
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label for="height" class="flex items-center gap-2 font-bold mb-2"><span class="step-num">4</span> الطول بالضبط</label>
-              <div class="relative">
-                <input id="height" name="height" type="number" inputmode="decimal" min="100" max="230" step="0.5" required placeholder="مثال: 170"
-                  class="w-full rounded-xl bg-slate-900/80 border border-slate-700 pr-4 pl-14 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition" />
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">سم</span>
-              </div>
-              <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="height">الطول بالسنتيمتر بين 100 و 230.</p>
-            </div>
-            <div>
-              <label for="weight" class="flex items-center gap-2 font-bold mb-2"><span class="step-num">5</span> الوزن بالضبط</label>
-              <div class="relative">
-                <input id="weight" name="weight" type="number" inputmode="decimal" min="25" max="250" step="0.1" required placeholder="مثال: 65"
-                  class="w-full rounded-xl bg-slate-900/80 border border-slate-700 pr-4 pl-14 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 transition" />
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">كجم</span>
-              </div>
-              <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="weight">الوزن بالكيلوجرام بين 25 و 250.</p>
-            </div>
-          </div>
-          <p class="text-xs text-slate-500 -mt-2">الطول والوزن قياسان دقيقان بطبيعتهما، لذلك يُكتبان مباشرة دون فئات.</p>
-
-          <p class="err hidden text-rose-400 text-xs" data-for="bmi">الطول والوزن غير منطقيين معاً — تأكد أن الطول بالسنتيمتر (مثل 170) والوزن بالكيلوجرام.</p>
-          <div id="bmiPreview" class="hidden rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-3 text-sm flex flex-wrap items-center gap-x-3 gap-y-1" aria-live="polite"></div>
-        </div>
-
-        <!-- 6–8. Steps, water, screen time (category → exact value) — rendered from CONDITIONALS -->
-        <div class="sec-head" role="presentation"><span class="sec-ico"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></span><span><span class="block font-bold text-slate-100 leading-tight">نشاطك اليومي</span><span class="block text-xs text-slate-400">الأسئلة 6 – 8</span></span></div>
-        <div id="stepsQ"></div>
-        <div id="waterQ"></div>
-        <div id="screenQ"></div>
-
-        <!-- 9–12. Sleep, sleep quality, fast food, exercise time — conditional questions rendered from CONDITIONALS in the script -->
-        <div class="sec-head" role="presentation"><span class="sec-ico"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.4 15.4A9 9 0 018.6 3.6 9 9 0 1020.4 15.4z"/></svg></span><span><span class="block font-bold text-slate-100 leading-tight">نمط حياتك</span><span class="block text-xs text-slate-400">الأسئلة 9 – 12</span></span></div>
-        <div id="conditionalQuestions" class="space-y-8"></div>
-
-        <div class="sec-head" role="presentation"><span class="sec-ico"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1zm4 15h2"/></svg></span><span><span class="block font-bold text-slate-100 leading-tight">تطبيقك المثالي</span><span class="block text-xs text-slate-400">الأسئلة 13 – 18</span></span></div>
-
-        <!-- 13. Challenge -->
-        <fieldset>
-          <legend class="flex items-center gap-2 font-bold mb-3"><span class="step-num">13</span> ما أكبر تحدٍّ يمنعك من نمط حياة نشط؟</legend>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="challengeGroup"></div>
-          <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="main_challenge">يرجى اختيار التحدي الرئيسي.</p>
-        </fieldset>
-
-        <!-- 14. Goal -->
-        <fieldset>
-          <legend class="flex items-center gap-2 font-bold mb-3"><span class="step-num">14</span> ما هدفك الصحي الرئيسي؟</legend>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="goalGroup"></div>
-          <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="main_goal">يرجى اختيار هدفك الصحي.</p>
-        </fieldset>
-
-        <!-- 15. Feature -->
-        <fieldset>
-          <legend class="flex items-center gap-2 font-bold mb-3"><span class="step-num">15</span> ما الميزة التي ستحفّزك أكثر لاستخدام التطبيق؟</legend>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="featureGroup"></div>
-          <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="preferred_feature">يرجى اختيار الميزة المفضلة.</p>
-        </fieldset>
-
-        <!-- 16. System philosophy -->
-        <fieldset>
-          <legend class="flex items-center gap-2 font-bold mb-3"><span class="step-num">16</span> أي أسلوب تطبيق يناسب شخصيتك أكثر؟</legend>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="styleGroup"></div>
-          <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="preferred_system_style">يرجى اختيار أسلوب النظام المفضّل.</p>
-        </fieldset>
-
-        <!-- 17. Current health app (conditional free-text for "other") — rendered from CONDITIONALS -->
-        <div id="appQuestions" class="space-y-8"></div>
-
-        <!-- 18. Wild idea (optional) -->
-        <div>
-          <label for="wild_idea" class="flex items-start gap-2 font-bold mb-2">
-            <span class="step-num">18</span>
-            <span>لو تقدر تضيف ميزة واحدة غريبة أو مبتكرة تجعلك تستخدم التطبيق يومياً.. ويش بتكون؟ <span class="text-xs font-normal text-slate-500">(اختياري)</span></span>
-          </label>
-          <textarea id="wild_idea" name="wild_idea" rows="3" maxlength="500"
-            placeholder="مثال: الخطوات تفتح لي خصم قهوة، أو التطبيق يطلع لي مسار مشي مكيّف قريب لما الجو حار…"
-            class="w-full rounded-xl bg-slate-900/80 border border-slate-700 px-4 py-3 text-slate-100 placeholder-slate-500 leading-relaxed focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 transition resize-y"></textarea>
-          <div class="flex justify-between text-xs text-slate-500 mt-1.5">
-            <span>💡 أفكارك تُدرس مباشرة في مرحلة توليد الأفكار للمشروع (المعيار B).</span>
-            <span id="ideaCount" dir="ltr">0 / 500</span>
-          </div>
-        </div>
-
-        <!-- consent -->
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-400 leading-relaxed flex gap-3">
-          <svg class="w-5 h-5 shrink-0 text-emerald-400 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/></svg>
-          <div class="space-y-2">
-            <p class="text-slate-300 font-medium">هذا الاستبيان مخصص لجمع البيانات وتحليلها لمشروع بحثي نهائي يقدمه طالب ضمن برنامج IB MYP (المعيار A). جميع البيانات تُستخدم لغرض تطوير نموذج التطبيق ولا تُشارك مع أي طرف ثالث.</p>
-            <p>بإرسال النموذج، توافق على استخدام إجاباتك <b class="text-slate-300">لأغراض بحثية تعليمية فقط</b>. لا نطلب أي بيانات تعريفية، ويمكنك استخدام اسم مستعار. يُستخدم العمر والجنس والطول والوزن لحساب مؤشر كتلة الجسم وتحليل العينة إحصائياً فقط. التقرير لا يُغني عن استشارة الطبيب.</p>
-          </div>
-        </div>
-
-        <!-- honeypot: hidden from people, bots tend to fill it; a filled honeypot means nothing is sent -->
-        <div aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap">
-          <label for="_gotcha">اترك هذا الحقل فارغاً</label>
-          <input id="_gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
-        </div>
-
-        <button id="submitBtn" type="submit"
-          class="group w-full rounded-2xl bg-gradient-to-l from-emerald-500 to-cyan-500 py-4 text-lg font-extrabold text-slate-950 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:brightness-110 active:scale-[.99] transition flex items-center justify-center gap-2">
-          حلّل بياناتي واحصل على التقرير
-          <svg class="w-5 h-5 transition group-hover:-translate-x-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-      </form>
     </section>
 
     <!-- ============ LOADER ============ -->
-    <section id="loader" class="hidden py-16" aria-live="polite">
-      <div class="glass rounded-3xl border border-slate-800 p-8 sm:p-12 text-center max-w-xl mx-auto relative overflow-hidden">
+    <section id="loader" class="hidden" aria-live="polite">
+      <div class="glass rounded-3xl border border-slate-800 p-8 sm:p-12 text-center relative overflow-hidden">
         <div class="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-transparent via-emerald-400/10 to-transparent scan pointer-events-none"></div>
         <div class="relative w-36 h-36 mx-auto mb-8">
           <div class="absolute inset-0 rounded-full border-2 border-dashed border-emerald-400/40 orbit"></div>
@@ -361,7 +423,7 @@
           </div>
         </div>
         <p class="text-xs font-bold tracking-[.2em] text-emerald-400 mb-2" dir="ltr">AI HEALTH ANALYSIS ENGINE</p>
-        <h3 class="text-2xl font-extrabold mb-6">محرّك التحليل الصحي الذكي</h3>
+        <h3 class="text-2xl font-extrabold mb-6 text-slate-100">محرّك التحليل الصحي الذكي</h3>
         <ul id="loaderSteps" class="space-y-2.5 text-sm text-right max-w-xs mx-auto"></ul>
         <div class="mt-8 h-1.5 rounded-full bg-slate-800 overflow-hidden">
           <div id="loaderBar" class="h-full w-0 bg-gradient-to-l from-emerald-400 to-cyan-400 transition-all duration-500"></div>
@@ -371,21 +433,14 @@
 
     <!-- ============ REPORT ============ -->
     <section id="report" class="hidden space-y-6" aria-live="polite"></section>
-  </main>
 
-  <!-- ============ FOOTER ============ -->
-  <footer class="border-t border-slate-800/80 mt-12">
-    <div class="max-w-5xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500">
+    <!-- ============ FOOTER ============ -->
+    <footer class="mt-10 text-center text-[13px] leading-relaxed text-slate-400 space-y-1">
       <p>© <span id="year"></span> تطبيق صحة مجتمع البحرين · مشروع تصميم IB MYP
-        <span class="mx-1.5 text-slate-700">·</span><a href="https://bh-health-survey.vercel.app/admin" class="text-slate-500 hover:text-emerald-400 transition">لوحة التحليل</a></p>
-      <p dir="ltr" class="font-bold">Powered by <span class="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">RJ Works</span></p>
-    </div>
-  </footer>
-
-  <style>
-    .step-num { display:inline-grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:.55rem;
-      background: #ECFDF5; color: #047857; font-family: 'Inter', sans-serif; font-size:.8rem; font-weight:700; flex-shrink:0; }
-  </style>
+        <span class="mx-1.5 text-slate-600">·</span><a href="https://bh-health-survey.vercel.app/admin" class="hover:text-emerald-400 transition">لوحة التحليل</a></p>
+      <p dir="ltr" class="font-semibold">Powered by <span class="text-emerald-400">RJ Works</span></p>
+    </footer>
+  </main>
 
   <script>
   (() => {
@@ -778,8 +833,10 @@
       'تحسين النوم والتركيز': 'Better sleep & focus', 'نوم أعمق وطاقة ذهنية أفضل': 'Deeper sleep and better mental energy',
       'تنظيم شرب الماء والصحة العامة': 'Hydration & general health', 'عادات يومية متوازنة': 'Balanced daily habits',
       'قيم مقترحة': 'Suggested values',
-      'بياناتك الأساسية': 'About you', 'نشاطك اليومي': 'Your daily activity', 'نمط حياتك': 'Your lifestyle', 'تطبيقك المثالي': 'Your ideal app',
-      'الأسئلة 1 – 5': 'Questions 1 – 5', 'الأسئلة 6 – 8': 'Questions 6 – 8', 'الأسئلة 9 – 12': 'Questions 9 – 12', 'الأسئلة 13 – 18': 'Questions 13 – 18',
+      'التالي': 'Next', 'السابق': 'Back', 'دقيقتان': '2 minutes', '18 سؤالاً': '18 questions', 'تقرير صحي فوري': 'Instant health report',
+      'بياناتك الأساسية': 'About you', 'نشاطك اليومي': 'Your daily activity', 'نمط حياتك': 'Your lifestyle',
+      'تحدياتك وأهدافك': 'Challenges & goals', 'تطبيقك المثالي': 'Your ideal app', 'عن هذا الاستبيان': 'About this survey',
+      'تخطَّ إلى الاستبيان': 'Skip to the survey', 'معلومات الاستبيان': 'Survey details', 'تقدّم الاستبيان': 'Survey progress',
       // loader
       'قراءة بيانات النشاط البدني…': 'Reading your activity data…',
       'مقارنة القيم بمعايير منظمة الصحة العالمية…': 'Comparing against WHO benchmarks…',
@@ -831,6 +888,7 @@
       // Regenerate text that contains numbers or depends on state
       CONDITIONALS.forEach(c => { if ($(`#sub_${c.sub.name}`)?.classList.contains('open')) syncSub(c); });
       updateBmiPreview();
+      updateProgress();
       if (LAST_REPORT) { renderReport(LAST_REPORT.d, LAST_REPORT.a, false); if (LAST_STATUS) setSendStatus(LAST_STATUS); }
     }
     let LAST_REPORT = null, LAST_STATUS = null;
@@ -846,17 +904,16 @@
     /* ================= RENDER OPTIONS ================= */
     function renderOptions(container, name, items) {
       container.innerHTML = items.map((it, i) => `
-        <div class="opt relative">
-          <input class="peer sr-only" type="radio" name="${name}" id="${name}_${i}" value="${it.v}" required>
-          <label for="${name}_${i}" class="flex ${it.d ? 'items-start' : 'items-center'} gap-3 h-full min-h-[3.5rem] cursor-pointer rounded-2xl border border-slate-700 bg-slate-900 p-3 sm:p-3.5 hover:border-slate-600">
-            <span class="opt-ico w-9 h-9 shrink-0 rounded-xl bg-emerald-500/10 text-emerald-400 grid place-items-center transition-colors">${icon(it.icon)}</span>
+        <div class="opt">
+          <input class="sr-only" type="radio" name="${name}" id="${name}_${i}" value="${it.v}" required>
+          <label for="${name}_${i}" class="opt-box">
+            <span class="opt-tick" aria-hidden="true">${icon('M5 13l4 4L19 7', 'w-3 h-3')}</span>
+            <span class="opt-icon">${icon(it.icon)}</span>
             <span class="flex-1 min-w-0">
-              <span class="block font-semibold text-slate-100 text-[15px] leading-snug">${it.t}</span>
-              ${it.d ? `<span class="block text-xs text-slate-400 mt-0.5 leading-relaxed">${it.d}</span>` : ''}
+              <span class="opt-ar">${it.t}</span>
+              ${it.d ? `<span class="opt-desc">${it.d}</span>` : ''}
             </span>
-            <span class="tick opacity-0 scale-50 transition w-5 h-5 rounded-full bg-emerald-500 text-slate-950 grid place-items-center shrink-0">
-              ${icon('M5 13l4 4L19 7', 'w-3.5 h-3.5')}
-            </span>
+            <span class="dot" aria-hidden="true"></span>
           </label>
         </div>`).join('');
     }
@@ -866,54 +923,54 @@
     renderOptions($('#featureGroup'), 'preferred_feature', FEATURES);
 
     /* ---------- conditional questions ---------- */
-    const SUB_INPUT_CLS = 'rounded-xl bg-slate-900 border border-slate-600 px-4 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30 transition';
+    const SUB_INPUT_CLS = 'field';
     const subLabel = (forId, text) => `
-      <label ${forId ? `for="${forId}"` : ''} class="text-sm font-bold text-emerald-200 mb-3 flex items-center gap-2" id="lbl_${forId || text.length}">
-        ${icon('M9 5l7 7-7 7', 'w-4 h-4 rotate-180')} ${text}
+      <label ${forId ? `for="${forId}"` : ''} class="sub-label" id="lbl_${forId || text.length}">
+        ${icon('M9 5l7 7-7 7', 'w-4 h-4 flip-x rotate-180')} ${text}
       </label>`;
 
     // Free-text box for an "أخرى" choice: <name>_other, revealed only while "other" is selected
     const otherBox = name => `
       <div class="reveal" id="ob_${name}" aria-hidden="true" inert>
         <div>
-          <div class="mt-3 rounded-2xl border border-violet-500/30 bg-violet-500/[.06] p-4">
-            <label for="${name}_other" class="text-sm font-bold text-violet-200 mb-2 flex items-center gap-2">${icon(ICON.pencil, 'w-4 h-4')} ${OTHER_TEXT[name]}</label>
+          <div class="sub-panel sub-panel--other">
+            <label for="${name}_other" class="sub-label">${icon(ICON.pencil, 'w-4 h-4')} ${OTHER_TEXT[name]}</label>
             <input id="${name}_other" name="${name}_other" type="text" maxlength="${OTHER_MAX}" autocomplete="off" disabled placeholder="اكتب إجابتك هنا"
-              class="w-full sm:w-96 rounded-xl bg-slate-900 border border-slate-600 px-4 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-400/30 transition" />
-            <p class="err hidden text-rose-400 text-xs mt-2" data-for="${name}_other">يرجى كتابة إجابتك (حرفان على الأقل).</p>
+              class="field" />
+            <p class="err hidden" data-for="${name}_other">يرجى كتابة إجابتك (حرفان على الأقل).</p>
           </div>
         </div>
       </div>`;
 
     const subBody = s => {
       if (s.type === 'text') return `${subLabel(s.name, s.q)}
-        <input id="${s.name}" name="${s.name}" type="text" maxlength="${s.maxlength}" autocomplete="off" disabled placeholder="${s.placeholder}" class="w-full sm:w-80 ${SUB_INPUT_CLS}" />`;
+        <input id="${s.name}" name="${s.name}" type="text" maxlength="${s.maxlength}" autocomplete="off" disabled placeholder="${s.placeholder}" class="${SUB_INPUT_CLS}" />`;
       if (s.type === 'number') return `${subLabel(s.name, s.q)}
         <div class="flex flex-wrap items-center gap-2">
-          <div class="relative w-44">
-            <input id="${s.name}" name="${s.name}" type="number" inputmode="decimal" disabled class="w-full pl-14 ${SUB_INPUT_CLS}" />
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">${s.unit}</span>
+          <div class="relative w-full min-[420px]:w-48">
+            <input id="${s.name}" name="${s.name}" type="number" inputmode="decimal" disabled class="${SUB_INPUT_CLS} has-unit" />
+            <span class="field-unit">${s.unit}</span>
           </div>
           <div class="flex flex-wrap gap-1.5" data-suggest role="group" aria-label="قيم مقترحة"></div>
         </div>
-        <p class="text-xs text-slate-400 mt-2" data-range></p>`;
-      return `<p class="text-sm font-bold text-emerald-200 mb-3 flex items-center gap-2" id="lbl_${s.name}">${icon('M9 5l7 7-7 7', 'w-4 h-4 rotate-180')} ${s.q}</p>
+        <p class="hint mt-2" data-range></p>`;
+      return `<p class="sub-label" id="lbl_${s.name}">${icon('M9 5l7 7-7 7', 'w-4 h-4 flip-x rotate-180')} ${s.q}</p>
         <div class="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="lbl_${s.name}" data-chips></div>
         ${s.otherQ ? otherBox(s.name) : ''}`;
     };
 
     const condHTML = c => `
-      <fieldset>
-        <legend class="flex items-center gap-2 font-bold mb-3"><span class="step-num">${c.step}</span> ${c.q}</legend>
-        <div class="cat-grid grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="grp_${c.name}"></div>
-        ${c.hint ? `<p class="text-xs text-slate-500 mt-2">${c.hint}</p>` : ''}
-        <p class="err hidden text-rose-400 text-xs mt-1.5" data-for="${c.name}">${c.err}</p>
+      <fieldset class="q">
+        <legend><span class="q-head"><span class="q-num">${c.step}</span><span class="q-title">${c.q}</span></span></legend>
+        <div class="${c.name === 'favorite_health_app' ? 'grid gap-2.5 grid-cols-1 min-[420px]:grid-cols-2' : 'cat-grid'}" id="grp_${c.name}"></div>
+        ${c.hint ? `<p class="hint mt-2.5">${c.hint}</p>` : ''}
+        <p class="err hidden" data-for="${c.name}">${c.err}</p>
         ${own(OTHER_TEXT, c.name) ? otherBox(c.name) : ''}
         <div class="reveal" id="sub_${c.sub.name}" aria-hidden="true" inert>
           <div>
-            <div class="mt-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/[.06] p-4">
+            <div class="sub-panel">
               ${subBody(c.sub)}
-              <p class="err hidden text-rose-400 text-xs mt-2" data-for="${c.sub.name}">${c.sub.err || ''}</p>
+              <p class="err hidden" data-for="${c.sub.name}">${c.sub.err || ''}</p>
             </div>
           </div>
         </div>
@@ -967,7 +1024,7 @@
           $('[data-range]', box).textContent = tr(`المدى لهذه الفئة: من ${fmt(choices.min)} إلى ${fmt(choices.max)} ${s.unit}`, `Range for this category: ${fmt(choices.min)} to ${fmt(choices.max)} ${L(s.unit)}`);
           $(`.err[data-for="${s.name}"]`, box).textContent = numErr(s, choices);
           $('[data-suggest]', box).innerHTML = choices.suggest.map(v => `
-            <button type="button" data-fill="${v}" data-target="${s.name}" class="suggest rounded-lg border border-slate-600 bg-slate-900 px-3 py-1.5 text-xs font-bold text-slate-200 hover:border-emerald-400 transition">${s.chip ? s.chip(v) : fmt(v)}</button>`).join('');
+            <button type="button" data-fill="${v}" data-target="${s.name}" class="suggest">${s.chip ? s.chip(v) : fmt(v)}</button>`).join('');
           // A value typed for another category is out of range now — clear it rather than keep an inconsistent answer
           if (input.value !== '' && !inSpec(Number(input.value), choices)) input.value = '';
           markSuggest(s.name);
@@ -985,7 +1042,7 @@
           chips.innerHTML = choices.map((o, i) => `
             <span class="chip">
               <input class="sr-only" type="radio" name="${s.name}" id="${s.name}_${i}" value="${o.v}" required>
-              <label for="${s.name}_${i}" class="inline-block cursor-pointer rounded-xl border border-slate-600 bg-slate-900 px-4 py-2 text-sm font-bold text-slate-200 hover:border-emerald-400 transition">${o.t}</label>
+              <label for="${s.name}_${i}">${o.t}</label>
             </span>`).join('');
           chips.dataset.list = key;
         }
@@ -1050,14 +1107,68 @@
       box.classList.remove('hidden');
     }
     ['height', 'weight'].forEach(id => $('#' + id).addEventListener('input', updateBmiPreview));
-    function updateProgress() {
-      const fd = new FormData(form), fields = activeFields();
-      const done = fields.filter(f => String(fd.get(f) ?? '').trim() !== '').length;
-      const pct = Math.round(done / fields.length * 100);
-      $('#progressBar').style.width = pct + '%';
-      $('#headerProgress').style.width = pct + '%';
-      $('#progressText').textContent = pct + '%';
+    /* ================= STEPS (wizard) ================= */
+    const stepEls = $$('.step', form);
+    const TOTAL_STEPS = stepEls.length;
+    const STEP_NAMES = [['بياناتك الأساسية', 'About you'], ['نشاطك اليومي', 'Your daily activity'], ['نمط حياتك', 'Your lifestyle'],
+                        ['تحدياتك وأهدافك', 'Challenges & goals'], ['تطبيقك المثالي', 'Your ideal app']];
+    let current = 1;
+    const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stepOf = name => { const el = $(`.err[data-for="${name}"]`); const s = el && el.closest('.step'); return s ? Number(s.dataset.step) : 1; };
+    // The 17 required questions, each with the fields that make it complete (sub-question / "other" text only while shown)
+    const QUESTIONS = [['user_name'], ['gender'], ['age_range', 'age'], ['height'], ['weight'],
+      ['steps_range', 'daily_steps'], ['water_range', 'water_intake'], ['screen_range', 'screen_time'],
+      ['sleep_range', 'sleep_hours'], ['sleep_quality', 'sleep_quality_other', 'fatigue_cause', 'fatigue_cause_other'],
+      ['fast_food_freq', 'fast_food_count'], ['preferred_time', 'preferred_time_other', 'activity_place', 'activity_place_other'],
+      ['main_challenge', 'main_challenge_other'], ['main_goal', 'main_goal_other'], ['preferred_feature', 'preferred_feature_other'],
+      ['preferred_system_style', 'preferred_system_style_other'], ['favorite_health_app', 'favorite_app_other']];
+    function remainingLabel(n) {
+      if (LANG === 'en') return n === 0 ? 'All questions answered ✓' : n === 1 ? '1 question left' : `${n} questions left`;
+      if (n === 0) return 'اكتملت جميع الأسئلة ✓';
+      if (n === 1) return 'تبقّى سؤال واحد';
+      if (n === 2) return 'تبقّى سؤالان';
+      if (n <= 10) return `تبقّت ${n} أسئلة`;
+      return `تبقّى ${n} سؤالاً`;
     }
+    function updateProgress() {
+      const fd = new FormData(form);
+      const filled = f => !isActive(f) || String(fd.get(f) ?? '').trim() !== '';
+      const per = Array.from({ length: TOTAL_STEPS }, () => [0, 0]);
+      let done = 0;
+      QUESTIONS.forEach(fields => {
+        const s = stepOf(fields[0]) - 1, ok = fields.every(filled);
+        per[s][1]++; if (ok) { per[s][0]++; done++; }
+      });
+      $$('#progressbar .seg > span').forEach((bar, i) => { bar.style.width = (per[i][1] ? per[i][0] / per[i][1] * 100 : 0) + '%'; });
+      $('#progressbar').setAttribute('aria-valuenow', String(done));
+      $('#stepCounter').textContent = tr(`الخطوة ${current} من ${TOTAL_STEPS}`, `Step ${current} of ${TOTAL_STEPS}`);
+      $('#stepName').textContent = ' · ' + tr(...STEP_NAMES[current - 1]);
+      $('#remaining').textContent = remainingLabel(QUESTIONS.length - done);
+      $$('.q', form).forEach(q => {
+        const name = $('input', q)?.name;
+        const qf = QUESTIONS.find(f => f[0] === name);
+        q.classList.toggle('is-answered', !!qf && qf.every(filled));
+      });
+    }
+    function goTo(n, { back = false, focus = true } = {}) {
+      stepEls.forEach(s => s.classList.remove('is-active', 'is-back'));
+      const target = stepEls[n - 1];
+      target.classList.add('is-active');
+      if (back) target.classList.add('is-back');
+      current = n;
+      $('#prevBtn').hidden = n === 1;
+      $('#nextBtn').hidden = n === TOTAL_STEPS;
+      $('#submitBtn').hidden = n !== TOTAL_STEPS;
+      updateProgress();
+      if (focus) {
+        const top = $('#formSection').getBoundingClientRect().top + window.scrollY - 12;
+        if (window.scrollY > top) window.scrollTo({ top, behavior: reduceMotion() ? 'auto' : 'smooth' });
+        $('.step-title', target).focus({ preventScroll: true });
+      }
+    }
+    function next() { if (validateStep(current)) goTo(current + 1); }
+    $('#nextBtn').addEventListener('click', next);
+    $('#prevBtn').addEventListener('click', () => { if (current > 1) goTo(current - 1, { back: true }); });
     form.addEventListener('input', e => {
       if (SUB_NAMES.includes(e.target.name)) markSuggest(e.target.name);
       updateProgress(); if (e.target.name) clearErr(e.target.name);
@@ -1080,7 +1191,7 @@
     function showErr(name) { const el = $(`#err_${name}`); if (el) el.classList.remove('hidden'); const inp = $(`#${name}`); if (inp) { inp.classList.add('border-rose-500'); inp.setAttribute('aria-invalid', 'true'); } }
     function clearErr(name) { const el = $(`#err_${name}`); if (el) el.classList.add('hidden'); const inp = $(`#${name}`); if (inp) { inp.classList.remove('border-rose-500'); inp.removeAttribute('aria-invalid'); } }
 
-    function validate(d) {
+    function findBad(d) {
       const bad = [];
       if (!d.user_name) bad.push('user_name');
       if (!isOption(GENDERS, d.gender)) bad.push('gender');
@@ -1106,16 +1217,38 @@
       if (!isOption(SYSTEM_STYLES, d.preferred_system_style)) bad.push('preferred_system_style');
       // Every "أخرى" needs at least two characters of real text
       for (const n of OTHER_NAMES) if (d[n] === 'other' && cleanText(d[`${n}_other`], OTHER_MAX).length < 2) bad.push(`${n}_other`);
-      FIELDS.forEach(clearErr); clearErr('bmi');
       if (bmiBad) bad.push('bmi');
-      const order = k => k === 'bmi' ? FIELDS.indexOf('weight') + 0.5 : FIELDS.indexOf(k); // scroll to the first error in form order
+      const order = k => k === 'bmi' ? FIELDS.indexOf('weight') + 0.5 : FIELDS.indexOf(k); // first error in form order
       bad.sort((a, b) => order(a) - order(b));
+      return bad;
+    }
+    // Whole survey (on submit): show every error and open the step that holds the first one
+    function validate(d) {
+      const bad = findBad(d);
+      FIELDS.forEach(clearErr); clearErr('bmi');
       bad.forEach(showErr);
       if (bad.length) {
-        const first = $(`.err[data-for="${bad[0]}"]`);
-        (first.closest('fieldset') || first.parentElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const s = stepOf(bad[0]);
+        if (s !== current) goTo(s, { back: s < current, focus: false });
+        focusError(bad[0]);
       }
       return bad.length === 0;
+    }
+    // One step (on "Next"): the same rules, limited to the questions of that step
+    function validateStep(n) {
+      const bad = findBad(collect().data).filter(k => stepOf(k) === n);
+      $$('.err', stepEls[n - 1]).forEach(el => clearErr(el.dataset.for));
+      bad.forEach(showErr);
+      if (bad.length) focusError(bad[0]);
+      return bad.length === 0;
+    }
+    function focusError(name) {
+      const first = $(`.err[data-for="${name}"]`);
+      const box = first.closest('fieldset') || first.parentElement;
+      box.classList.remove('is-shaking'); void box.offsetWidth; box.classList.add('is-shaking');
+      box.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+      const target = $(`#${name}`) || $('input:not([disabled])', box);
+      if (target) target.focus({ preventScroll: true });
     }
 
     /* ================= ANALYSIS ENGINE ================= */
@@ -1830,8 +1963,7 @@
       await sleep(350);
     }
 
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
+    function collect() {
       const fd = new FormData(form);
       const data = {
         user_name: String(fd.get('user_name') || '').trim(),
@@ -1847,6 +1979,14 @@
       // Conditional answers arrive as strings; hidden sub-inputs are disabled so FormData omits them (→ '')
       CONDITIONALS.forEach(c => { data[c.name] = fd.get(c.name) || ''; data[c.sub.name] = fd.get(c.sub.name) || ''; });
       OTHER_NAMES.forEach(n => { data[`${n}_other`] = fd.get(`${n}_other`) || ''; });
+      return { fd, data };
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      // Enter on an earlier step moves forward instead of submitting
+      if (current < TOTAL_STEPS) { next(); return; }
+      const { fd, data } = collect();
       if (!validate(data)) return;
       // Validated — store the exact numbers from the sub-questions (the category is kept alongside).
       // "Rarely" (less than once a week) has no sub-question and is recorded as 0.
@@ -1909,8 +2049,10 @@
       $('#report').innerHTML = '';
       $('#hero').classList.remove('hidden');
       $('#formSection').classList.remove('hidden');
+      goTo(1, { focus: false });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    goTo(1, { focus: false });
     applyLang(); // apply the saved language once the whole form is rendered
   })();
   </script>
